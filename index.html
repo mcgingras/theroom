@@ -75,15 +75,15 @@
     console.log('Welcome!  Fetching your information.... ');
     FB.api('/me', function(response) {
       console.log(response);
-      const userid = response.userID;
+      const userid = response.id;
       console.log('Successful login for: ' + response.name);
       document.getElementById('status').innerHTML =
         'Thanks for logging in, ' + response.name + '!';
 
       FB.api('/'+userid+'/photos', function(response) {
-        console.log(resonse);
+        console.log(response);
       });
-      
+
     });
 
     FB.api('/')
