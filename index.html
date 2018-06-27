@@ -6,6 +6,8 @@
 </head>
 <body>
   <div id="photo-container"></div>
+  <button type="button" onclick="loadDoc()">Request data</button>
+  <p id="demo"></p>
 <script>
   // This is called with the results from from FB.getLoginStatus().
   function statusChangeCallback(response) {
@@ -97,6 +99,18 @@
 
     FB.api('/')
   }
+
+  function loadDoc() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("demo").innerHTML = this.responseText;
+      }
+    };
+    xhttp.open("GET", "https://api.particle.io/v1/devices/events?access_token=a532aabe4bf3ad9f1a151df427fa0ad121baca44", true);
+    xhttp.send();
+  }
+
 </script>
 
 <!--
