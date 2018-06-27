@@ -82,14 +82,15 @@
         'Thanks for logging in, ' + response.name + '!';
 
       FB.api('/'+userid+'/photos?fields=picture', function(response) {
-        response.forEach(function(pic){
-          let img_src = pic.picture;
-          var img = document.createElement("img");
-          img.src = img_src;
-          let container = document.getElementById('photo-container');
-          container.appendChild(img)
-          console.log(pic.picture);
-        })
+        console.log(response);
+        // response.forEach(function(pic){
+        //   let img_src = pic.picture;
+        //   var img = document.createElement("img");
+        //   img.src = img_src;
+        //   let container = document.getElementById('photo-container');
+        //   container.appendChild(img)
+        //   console.log(pic.picture);
+        // })
       });
 
     });
