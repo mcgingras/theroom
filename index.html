@@ -3,8 +3,8 @@
 <head>
 <title>Facebook Login JavaScript Example</title>
 <script language="javascript" type="text/javascript" src="p5.js"></script>
-<script type="text/javascript" src="jquery.js"></script>
-<script type="text/javascript" src="particle.min.js"></script>
+<!-- <script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="particle.min.js"></script> -->
 <meta charset="UTF-8">
 </head>
 <body>
@@ -84,27 +84,27 @@
 
 <script>
 
-var particle = new Particle();
-
-// Global variables
-var accessToken = "a532aabe4bf3ad9f1a151df427fa0ad121baca44";
-var deviceID = "2c0032000e51353532343635";
-
-
-$(document).ready(function() {
-    initPage();
-});
-
-
-function initPage() {
-    particle.getEventStream({ deviceId: deviceID, auth: accessToken }).then(function(stream) {
-        stream.on('event', function(e) {
-            console.log("Event: " + e);
-            //registers a 1 every time photon button is pressed
-            console.log(e.data)
-        });
-    });
-}
+// var particle = new Particle();
+//
+// // Global variables
+// var accessToken = "a532aabe4bf3ad9f1a151df427fa0ad121baca44";
+// var deviceID = "2c0032000e51353532343635";
+//
+//
+// $(document).ready(function() {
+//     initPage();
+// });
+//
+//
+// function initPage() {
+//     particle.getEventStream({ deviceId: deviceID, auth: accessToken }).then(function(stream) {
+//         stream.on('event', function(e) {
+//             console.log("Event: " + e);
+//             //registers a 1 every time photon button is pressed
+//             console.log(e.data)
+//         });
+//     });
+// }
 
 let userid;
 function Star() {
@@ -123,7 +123,7 @@ function Star() {
     }
   }
 
-  this.show = function(i) {
+  this.show = function() {
     fill(255);
     noStroke();
 
@@ -131,17 +131,22 @@ function Star() {
     var sy = map(this.y / this.z, 0, 1, 0, height);
 
     var r = map(this.z, 0, width, 200, 1);
-    img = imgs[0]
+    // img = imgs[0]
     image(img, sx, sy, r, r);
   }
 }
 
 var stars = [];
 var speed;
-var imgs;
+let img;
 
 function preload(url) {
-  imgs[0] = loadImage(url);
+  console.log('the url is ' + url);
+  url.forEach((photo) => {
+    img = loadImage(photo);
+  })
+  
+  // imgs[0] = loadImage(url);
 }
 
 // preloads photos from facebook api
@@ -167,7 +172,7 @@ function draw() {
   translate(width / 2, height / 2);
   for (var i = 0; i < stars.length; i++) {
     stars[i].update();
-    stars[i].show(i);
+    stars[i].show();
   }
 }
 
@@ -214,9 +219,8 @@ function draw() {
       console.log(response);
       userid = response.id;
 
-      FB.api('/me/picture', function(response) {
-        console.log(response);
-        const url = response.url;
+      FB.api(userid+'/picture?redirect=false', function(response) {
+        let url = [response.data.url];
         preload(url);
       });
 
