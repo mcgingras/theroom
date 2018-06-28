@@ -2,34 +2,179 @@
 <html>
 <head>
 <title>Facebook Login JavaScript Example</title>
+<script language="javascript" type="text/javascript" src="p5.js"></script>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="particle.min.js"></script>
 <meta charset="UTF-8">
 </head>
 <body>
-  <div id="photo-container"></div>
-  <button type="button" onclick="loadDoc()">Request data</button>
-  <p id="demo"></p>
+  <style>
+
+  body{
+    display: flex;
+    align-items: center;
+  }
+
+  #p5_loading{
+    display: none;
+  }
+
+  .demo-container{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .textbox{
+    width: 600px;
+    height: 600px;
+    background-color: #222222;
+    /*display: flex;
+    justify-content: center;
+    align-items: center;*/
+  }
+
+  .textbox p{
+    font-family: Helvetica;
+    /*color: white;*/
+  }
+
+  @keyframes progress {
+    from {width: 0%;}
+    to {width: 100%;}
+  }
+
+  .progress-bar {
+    width: 0%;
+    height: 100%;
+    background-color: white;
+    position: absolute;
+    top: 0;
+  }
+
+  .animate{
+    animation-name: progress;
+    animation-duration: 40s;
+    display: block;
+  }
+
+  .progress-container{
+    margin: 0 auto;
+    position: relative;
+    width: 80%;
+    border: 2px solid black;
+    height: 50px;
+    background-color: #999;
+    display: none;
+  }
+
+  .show{
+    display: block;
+  }
+
+  .progress-text{
+    position: absolute;
+    right: 45%;
+    color: black;
+    text-align: center;
+  }
+
+  </style>
+
 <script>
-  // This is called with the results from from FB.getLoginStatus().
-  function statusChangeCallback(response) {
-    console.log('statusChangeCallback');
-    console.log(response);
-    // The response object is returned with a status field that lets the
-    // app know the current login status of the person.
-    // Full docs on the response object can be found in the documentation
-    // for FB.getLoginStatus().
-    if (response.status === 'connected') {
-      // Logged into your app and Facebook.
-      testAPI();
-    } else {
-      // The person is not logged into your app or we are unable to tell.
-      document.getElementById('status').innerHTML = 'Please log ' +
-        'into this app.';
+
+var particle = new Particle();
+
+// Global variables
+var accessToken = "a532aabe4bf3ad9f1a151df427fa0ad121baca44";
+var deviceID = "2c0032000e51353532343635";
+
+
+$(document).ready(function() {
+    initPage();
+});
+
+
+function initPage() {
+    particle.getEventStream({ deviceId: deviceID, auth: accessToken }).then(function(stream) {
+        stream.on('event', function(e) {
+            console.log("Event: " + e);
+            //registers a 1 every time photon button is pressed
+            console.log(e.data)
+        });
+    });
+}
+
+let userid;
+function Star() {
+  this.x = random(-width, width);
+  this.y = random(-height, height);
+  this.z = random(width);
+  this.pz = this.z;
+
+  this.update = function() {
+    this.z = this.z - speed;
+    if (this.z < 1) {
+      this.z = width;
+      this.x = random(-width, width);
+      this.y = random(-height, height);
+      this.pz = this.z;
     }
   }
 
-  // This function is called when someone finishes with the Login
-  // Button.  See the onlogin handler attached to it in the sample
-  // code below.
+  this.show = function(i) {
+    fill(255);
+    noStroke();
+
+    var sx = map(this.x / this.z, 0, 1, 0, width);
+    var sy = map(this.y / this.z, 0, 1, 0, height);
+
+    var r = map(this.z, 0, width, 200, 1);
+    img = imgs[i%20]
+    image(img, sx, sy, r, r);
+  }
+}
+
+var stars = [];
+var speed;
+
+// preloads photos from facebook api
+function preload(photos) {
+  imgs = []
+  photos.forEach((photo,i) =>{
+    let src = photo.picture;
+    imgs[i] = loadImage(src);
+  })
+}
+
+function setup() {
+  createCanvas(600, 600);
+  for (var i = 0; i < 400; i++) {
+    stars[i] = new Star();
+  }
+}
+
+function draw() {
+  //speed = map(mouseX, 0, width, 0, 50);
+  speed = 3;
+  background(0);
+  translate(width / 2, height / 2);
+  for (var i = 0; i < stars.length; i++) {
+    stars[i].update();
+    stars[i].show(i);
+  }
+}
+
+  function statusChangeCallback(response) {
+    console.log('statusChangeCallback');
+    console.log(response);
+    if (response.status === 'connected') {
+      testAPI();
+      parseFlow(1);
+    }
+  }
+
   function checkLoginState() {
     FB.getLoginStatus(function(response) {
       statusChangeCallback(response);
@@ -40,22 +185,9 @@
     FB.init({
       appId      : '212601026049264',
       cookie     : true,  // enable cookies to allow the server to access
-                          // the session
       xfbml      : true,  // parse social plugins on this page
       version    : 'v2.8' // use graph api version 2.8
     });
-
-    // Now that we've initialized the JavaScript SDK, we call
-    // FB.getLoginStatus().  This function gets the state of the
-    // person visiting this page and can return one of three states to
-    // the callback you provide.  They can be:
-    //
-    // 1. Logged into your app ('connected')
-    // 2. Logged into Facebook, but not your app ('not_authorized')
-    // 3. Not logged into Facebook and can't tell if they are logged into
-    //    your app or not.
-    //
-    // These three cases are handled in the callback function.
 
     FB.getLoginStatus(function(response) {
       statusChangeCallback(response);
@@ -72,58 +204,51 @@
     fjs.parentNode.insertBefore(js, fjs);
   }(document, 'script', 'facebook-jssdk'));
 
-  // Here we run a very simple test of the Graph API after login is
-  // successful.  See statusChangeCallback() for when this call is made.
   function testAPI() {
-    console.log('Welcome!  Fetching your information.... ');
     FB.api('/me', function(response) {
       console.log(response);
-      const userid = response.id;
-      console.log('Successful login for: ' + response.name);
-      document.getElementById('status').innerHTML =
-        'Thanks for logging in, ' + response.name + '!';
+      userid = response.id;
 
       FB.api('/'+userid+'/photos?fields=picture', function(response) {
         const photo_list = response.data;
-        photo_list.forEach(function(pic){
-          let img_src = pic.picture;
-          var img = document.createElement("img");
-          img.src = img_src;
-          let container = document.getElementById('photo-container');
-          container.appendChild(img)
-          console.log(pic.picture);
-        })
+        preload(photo_list);
       });
 
     });
-
-    FB.api('/')
   }
 
-  function loadDoc() {
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
-        document.getElementById("demo").innerHTML = this.responseText;
-      }
-    };
-    xhttp.open("GET", "https://api.particle.io/v1/devices/events?access_token=a532aabe4bf3ad9f1a151df427fa0ad121baca44", true);
-    xhttp.send();
+  function parseFlow(page) {
+
+    var flowtext = document.getElementById('textbox-flow');
+    var progressbar = document.getElementById('progress-bar');
+    var progresscontainer = document.getElementById('progress-container');
+
+    switch (page) {
+      case 1:
+        flowtext.innerHTML = "Your account is being removed, please wait..."
+        progressbar.className += ' animate'
+        progresscontainer.className += ' show'
+        break;
+      default:
+    }
   }
 
 </script>
 
-<!--
-  Below we include the Login Button social plugin. This button uses
-  the JavaScript SDK to present a graphical Login button that triggers
-  the FB.login() function when clicked.
--->
 
 <fb:login-button scope="public_profile,email,user_photos" onlogin="checkLoginState();">
 </fb:login-button>
 
-<div id="status">
-</div>
+  <div class="textbox">
+
+  <p class="textbox--1" id="textbox-flow">Free Your Data</p>
+  <div class="progress-container" id="progress-container">
+    <div class="progress-bar" id="progress-bar">
+    </div>
+    <p class="progress-text">Deleting...</p>
+  </div>
+
+  </div>
 
 </body>
 </html>
