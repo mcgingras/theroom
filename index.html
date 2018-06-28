@@ -35,6 +35,11 @@
       align-items: center;*/
     }
 
+    img{
+      width: 600px;
+      height: 600px;
+    }
+
     .textbox p{
       font-family: Helvetica;
       /*color: white;*/
@@ -260,6 +265,7 @@ function draw() {
     var progresscontainer = document.getElementById('progress-container');
     var input = document.getElementById("enterbtn");
     var canvas = document.getElementById("defaultCanvas0");
+    var img = document.getElementById('img');
 
     var tb1 = document.getElementById('textbox-flow')
 
@@ -270,10 +276,11 @@ function draw() {
         flowtextsub.innerHTML = "Press the red button..."
         break;
       case 1:
-        flowtext.innerHTML = "Your account is being removed, please wait..."
-        flowtextsub.innerHTML = ""
-        progressbar.className += ' animate'
-        progresscontainer.className += ' show'
+        flowtext.innerHTML = "Your account is being removed, please wait...";
+        flowtextsub.innerHTML = "";
+        progressbar.className += ' animate';
+        progresscontainer.className += ' show';
+        img.style.display = "none";
         break;
       case 2:
         flowtext.innerHTML = "Your account has been removed. Pop the balloon."
@@ -300,6 +307,8 @@ function draw() {
     <p class="progress-text">Deleting...</p>
   </div>
 </div>
+
+<img src="img.jpg" id = "img" alt="">
 
 
 </body>
