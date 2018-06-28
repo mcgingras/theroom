@@ -210,6 +210,7 @@ function draw() {
       userid = response.id;
 
       FB.api('/'+userid+'/photos?fields=picture', function(response) {
+        console.log(response.data);
         const photo_list = response.data;
         preload(photo_list);
       });
