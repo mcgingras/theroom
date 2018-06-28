@@ -3,108 +3,127 @@
 <head>
 <title>Facebook Login JavaScript Example</title>
 <script language="javascript" type="text/javascript" src="p5.js"></script>
-<!-- <script type="text/javascript" src="jquery.js"></script>
-<script type="text/javascript" src="particle.min.js"></script> -->
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="particle.min.js"></script>
 <meta charset="UTF-8">
 </head>
 <body>
   <style>
 
-  body{
-    display: flex;
-    align-items: center;
-  }
+    body{
+      display: flex;
+      align-items: center;
+    }
 
-  #p5_loading{
-    display: none;
-  }
+    #p5_loading{
+      display: none;
+    }
 
-  .demo-container{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
+    .demo-container{
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-  .textbox{
-    width: 600px;
-    height: 600px;
-    background-color: #222222;
-    /*display: flex;
-    justify-content: center;
-    align-items: center;*/
-  }
+    .textbox{
+      width: 600px;
+      height: 600px;
+      background-color: #222222;
+      /*display: flex;
+      justify-content: center;
+      align-items: center;*/
+    }
 
-  .textbox p{
-    font-family: Helvetica;
-    /*color: white;*/
-  }
+    .textbox p{
+      font-family: Helvetica;
+      /*color: white;*/
+    }
 
-  @keyframes progress {
-    from {width: 0%;}
-    to {width: 100%;}
-  }
+    .textbox--1{
+      color: white;
+      font-size: 24px;
+      text-align: center;
+    }
 
-  .progress-bar {
-    width: 0%;
-    height: 100%;
-    background-color: white;
-    position: absolute;
-    top: 0;
-  }
+    input{
+      margin: 0 auto;
+      display: block;
+      height: 20px;
+      width: 300px;
+    }
 
-  .animate{
-    animation-name: progress;
-    animation-duration: 40s;
-    display: block;
-  }
+    @keyframes progress {
+      from {width: 0%;}
+      to {width: 100%;}
+    }
 
-  .progress-container{
-    margin: 0 auto;
-    position: relative;
-    width: 80%;
-    border: 2px solid black;
-    height: 50px;
-    background-color: #999;
-    display: none;
-  }
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background-color: white;
+      position: absolute;
+      top: 0;
+    }
 
-  .show{
-    display: block;
-  }
+    .animate{
+      animation-name: progress;
+      animation-duration: 40s;
+      display: block;
+    }
 
-  .progress-text{
-    position: absolute;
-    right: 45%;
-    color: black;
-    text-align: center;
-  }
+    .progress-container{
+      margin: 0 auto;
+      position: relative;
+      width: 80%;
+      border: 2px solid black;
+      height: 50px;
+      background-color: #999;
+      display: none;
+    }
 
+    .show{
+      display: block;
+    }
+
+    .progress-text{
+      position: absolute;
+      right: 45%;
+      color: black;
+      text-align: center;
+    }
   </style>
 
 <script>
 
-// var particle = new Particle();
-//
-// // Global variables
-// var accessToken = "a532aabe4bf3ad9f1a151df427fa0ad121baca44";
-// var deviceID = "2c0032000e51353532343635";
-//
-//
-// $(document).ready(function() {
-//     initPage();
-// });
-//
-//
-// function initPage() {
-//     particle.getEventStream({ deviceId: deviceID, auth: accessToken }).then(function(stream) {
-//         stream.on('event', function(e) {
-//             console.log("Event: " + e);
-//             //registers a 1 every time photon button is pressed
-//             console.log(e.data)
-//         });
-//     });
-// }
+var particle = new Particle();
+
+// Global variables
+var accessToken = "a532aabe4bf3ad9f1a151df427fa0ad121baca44";
+var deviceID = "2c0032000e51353532343635";
+
+
+$(document).ready(function() {
+    initPage();
+});
+
+
+function initPage() {
+    particle.getEventStream({ deviceId: deviceID, auth: accessToken }).then(function(stream) {
+        stream.on('event', function(e) {
+            console.log("Event: " + e);
+            //registers a 1 every time photon button is pressed
+            parseFlow(1);
+            FB.api(userid+'/picture?redirect=false', function(response) {
+              let url = [response.data.url];
+              preload(url);
+              setTimeout(function () {
+                parseFlow(2);
+              }, 40000);
+            });
+        });
+    });
+}
 
 let userid;
 function Star() {
@@ -145,7 +164,7 @@ function preload(url) {
   url.forEach((photo) => {
     img = loadImage(photo);
   })
-  
+
   // imgs[0] = loadImage(url);
 }
 
@@ -181,7 +200,7 @@ function draw() {
     console.log(response);
     if (response.status === 'connected') {
       testAPI();
-      parseFlow(1);
+      parseFlow(0);
     }
   }
 
@@ -219,10 +238,10 @@ function draw() {
       console.log(response);
       userid = response.id;
 
-      FB.api(userid+'/picture?redirect=false', function(response) {
-        let url = [response.data.url];
-        preload(url);
-      });
+      // FB.api(userid+'/picture?redirect=false', function(response) {
+      //   let url = [response.data.url];
+      //   preload(url);
+      // });
 
       // FB.api('/'+userid+'/photos?fields=picture', function(response) {
       //   console.log(response.data);
@@ -236,16 +255,33 @@ function draw() {
   function parseFlow(page) {
 
     var flowtext = document.getElementById('textbox-flow');
+    var flowtextsub = document.getElementById('textbox-flow-sub');
     var progressbar = document.getElementById('progress-bar');
     var progresscontainer = document.getElementById('progress-container');
+    var input = document.getElementById("enterbtn");
+    var canvas = document.getElementById("defaultCanvas0");
+
+    var tb1 = document.getElementById('textbox-flow')
 
     switch (page) {
+      case 0:
+        console.log('is this showing up');
+        flowtext.innerHTML = "Are you sure you want to delete your account"
+        flowtextsub.innerHTML = "Press the red button..."
+        break;
       case 1:
         flowtext.innerHTML = "Your account is being removed, please wait..."
+        flowtextsub.innerHTML = ""
         progressbar.className += ' animate'
         progresscontainer.className += ' show'
         break;
+      case 2:
+        flowtext.innerHTML = "Your account has been removed. Pop the balloon."
+        flowtextsub.innerHTML = "Your data is in the USB. Live Free."
+        progresscontainer.style.display = "none";
+        canvas.style.display = "none";
       default:
+        break;
     }
   }
 
@@ -255,16 +291,16 @@ function draw() {
 <fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
 </fb:login-button>
 
-  <div class="textbox">
-
+<div class="textbox">
   <p class="textbox--1" id="textbox-flow">Free Your Data</p>
+  <p class="textbox--1" id="textbox-flow-sub">(click the login)</p>
   <div class="progress-container" id="progress-container">
     <div class="progress-bar" id="progress-bar">
     </div>
     <p class="progress-text">Deleting...</p>
   </div>
+</div>
 
-  </div>
 
 </body>
 </html>
