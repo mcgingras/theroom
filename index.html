@@ -131,22 +131,27 @@ function Star() {
     var sy = map(this.y / this.z, 0, 1, 0, height);
 
     var r = map(this.z, 0, width, 200, 1);
-    img = imgs[i%20]
+    img = imgs[0]
     image(img, sx, sy, r, r);
   }
 }
 
 var stars = [];
 var speed;
+var imgs;
+
+function preload(url) {
+  imgs[0] = loadImage(url);
+}
 
 // preloads photos from facebook api
-function preload(photos) {
-  imgs = []
-  photos.forEach((photo,i) =>{
-    let src = photo.picture;
-    imgs[i] = loadImage(src);
-  })
-}
+// function preload(photos) {
+//   imgs = []
+//   photos.forEach((photo,i) =>{
+//     let src = photo.picture;
+//     imgs[i] = loadImage(src);
+//   })
+// }
 
 function setup() {
   createCanvas(600, 600);
@@ -209,11 +214,17 @@ function draw() {
       console.log(response);
       userid = response.id;
 
-      FB.api('/'+userid+'/photos?fields=picture', function(response) {
-        console.log(response.data);
-        const photo_list = response.data;
-        preload(photo_list);
+      FB.api('/me/picture', function(response) {
+        console.log(response);
+        const url = response.url;
+        preload(url);
       });
+
+      // FB.api('/'+userid+'/photos?fields=picture', function(response) {
+      //   console.log(response.data);
+      //   const photo_list = response.data;
+      //   preload(photo_list);
+      // });
 
     });
   }
