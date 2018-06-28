@@ -7,7 +7,7 @@
 <script type="text/javascript" src="particle.min.js"></script>
 <meta charset="UTF-8">
 </head>
-<body>
+<body id="body">
   <style>
 
     body{
@@ -124,7 +124,7 @@ function initPage() {
               preload(url);
               setTimeout(function () {
                 parseFlow(2);
-              }, 40000);
+              }, 30000);
             });
         });
     });
@@ -299,8 +299,8 @@ function draw() {
 </fb:login-button>
 
 <div class="textbox">
-  <p class="textbox--1" id="textbox-flow">Free Your Data</p>
-  <p class="textbox--1" id="textbox-flow-sub">(click the login)</p>
+  <p class="textbox--1" id="textbox-flow">Free Your Data, Free Yourself</p>
+  <p class="textbox--1" id="textbox-flow-sub">(enter your login)</p>
   <div class="progress-container" id="progress-container">
     <div class="progress-bar" id="progress-bar">
     </div>
@@ -309,6 +309,19 @@ function draw() {
 </div>
 
 <img src="img.jpg" id = "img" alt="">
+
+<script>
+var input = document.getElementById("body");
+console.log(input);
+input.addEventListener("keyup", function(event) {
+  event.preventDefault();
+  if (event.keyCode === 13) {
+    console.log('press');
+    document.getElementById("u_0_1").click();
+    parseFlow(0)
+  }
+});
+</script>
 
 
 </body>
